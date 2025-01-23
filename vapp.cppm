@@ -1,6 +1,7 @@
 #pragma leco add_impl impl
 export module vapp;
 
+import casein;
 import mtx;
 import silog;
 import sitime;
@@ -62,7 +63,7 @@ protected:
   }
 
   void main_loop(const char * app_name, auto fn) {
-    voo::device_and_queue dq { app_name };
+    voo::device_and_queue dq { app_name, casein::native_ptr };
     while (!interrupted()) {
       voo::swapchain_and_stuff sw { dq };
       fn(dq, sw);
