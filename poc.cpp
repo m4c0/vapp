@@ -11,7 +11,7 @@ struct : public vapp {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       auto pl = vee::create_pipeline_layout();
       voo::one_quad_render oqr { "poc", &dq, *pl };
-      ots_loop(dq, sw, [&](auto cb) {
+      render_loop(dq, sw, [&](auto cb) {
         oqr.run(cb, sw.extent());
       });
     });
