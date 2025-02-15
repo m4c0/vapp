@@ -6,7 +6,10 @@ import mtx;
 import silog;
 import sitime;
 import sith;
+import traits;
 import voo;
+
+using traits::is_callable;
 
 export class vapp : public sith::thread {
   volatile bool m_suspended {};
@@ -62,12 +65,15 @@ protected:
     m_init_cond.wake_all();
   }
 
-  void main_loop(const char * app_name, auto fn) {
+  void main_loop(const char * app_name, is_callable<voo::device_and_queue &> auto fn) {
     voo::device_and_queue dq { app_name, casein::native_ptr };
-    while (!interrupted()) {
+    while (!interrupted()) fn(dq);
+  }
+  void main_loop(const char * app_name, is_callable<voo::device_and_queue &, voo::swapchain_and_stuff &> auto fn) {
+    main_loop(app_name, [&](auto & dq) {
       voo::swapchain_and_stuff sw { dq };
       fn(dq, sw);
-    }
+    });
   }
   void ots_loop(voo::device_and_queue & dq, voo::swapchain_and_stuff & sw, auto && fn) {
     auto q = dq.queue();
