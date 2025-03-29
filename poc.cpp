@@ -6,13 +6,28 @@ import vee;
 import voo;
 import vapp;
 
-struct : public vapp {
-  void run() {
+struct shrt : public vapp {
+  void run() override {
     main_loop("poc-voo", [&](auto & dq, auto & sw) {
       auto pl = vee::create_pipeline_layout();
       voo::one_quad_render oqr { "poc", &dq, *pl };
       render_loop(dq, sw, [&](auto cb) {
         oqr.run(cb, sw.extent());
+      });
+    });
+  }
+};
+
+struct lng : public vapp {
+  void run() override {
+    main_loop("poc-voo", [&](auto & dq, auto & sw) {
+      auto pl = vee::create_pipeline_layout();
+      voo::one_quad_render oqr { "poc", &dq, *pl };
+      extent_loop(dq.queue(), sw, [&] {
+        sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
+          auto scb = sw.cmd_render_pass({ *pcb });
+          oqr.run(*pcb, sw.extent());
+        });
       });
     });
   }
