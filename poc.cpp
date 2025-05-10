@@ -12,7 +12,9 @@ struct shrt : public vapp {
       auto pl = vee::create_pipeline_layout();
       voo::one_quad_render oqr { "poc", &dq, *pl };
       render_loop(dq, sw, [&](auto cb) {
-        oqr.run(cb, sw.extent());
+        vee::cmd_set_viewport(cb, sw.extent());
+        vee::cmd_set_scissor(cb, sw.extent());
+        oqr.run(cb);
       });
     });
   }
@@ -26,7 +28,9 @@ struct lng : public vapp {
       extent_loop(dq.queue(), sw, [&] {
         sw.queue_one_time_submit(dq.queue(), [&](auto pcb) {
           auto scb = sw.cmd_render_pass({ *pcb });
-          oqr.run(*pcb, sw.extent());
+          vee::cmd_set_viewport(*pcb, sw.extent());
+          vee::cmd_set_scissor(*pcb, sw.extent());
+          oqr.run(*pcb);
         });
       });
     });
