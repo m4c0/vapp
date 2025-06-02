@@ -17,19 +17,16 @@ export class vapp : public sith::thread {
   sith::run_guard m_run{};
 
   mtx::mutex m_mutex{};
-  mtx::cond m_init_cond{};
   mtx::cond m_sus_cond{};
   bool m_init{};
 
 protected:
-  [[nodiscard]] auto &resized() { return m_resized; }
-
   void extent_loop(auto fn) {
     sitime::stopwatch time {};
     int count {};
 
-    resized() = false;
-    while (!interrupted() && !resized() && !m_suspended) {
+    m_resized = false;
+    while (!interrupted() && !m_resized && !m_suspended) {
       count++;
       fn();
     }
@@ -51,18 +48,6 @@ protected:
       sw.queue_present(q);
     });
     q->device_wait_idle();
-  }
-
-  void wait_init() {
-    mtx::lock l{&m_mutex};
-    while (!interrupted() && !m_init) {
-      m_init_cond.wait(&l);
-    }
-  }
-  void release_init_lock() {
-    mtx::lock l{&m_mutex};
-    m_init = true;
-    m_init_cond.wake_all();
   }
 
   void main_loop(const char * app_name, is_callable<voo::device_and_queue &> auto fn) {
