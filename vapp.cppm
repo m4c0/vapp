@@ -63,9 +63,7 @@ protected:
   void ots_loop(voo::device_and_queue & dq, voo::swapchain_and_stuff & sw, auto && fn) {
     auto q = dq.queue();
     extent_loop(q, sw, [&] {
-      sw.queue_one_time_submit(q, [&](auto pcb) {
-        fn(*pcb);
-      });
+      sw.queue_one_time_submit(q, fn);
     });
   }
   void render_loop(voo::device_and_queue & dq, voo::swapchain_and_stuff & sw, auto && fn) {
