@@ -56,7 +56,8 @@ protected:
   }
   void main_loop(const char * app_name, is_callable<voo::device_and_queue &, voo::swapchain_and_stuff &> auto fn) {
     main_loop(app_name, [&](auto & dq) {
-      voo::swapchain_and_stuff sw { dq };
+      auto rp = voo::single_att_render_pass(dq);
+      voo::swapchain_and_stuff sw { dq, *rp };
       fn(dq, sw);
     });
   }
@@ -67,9 +68,9 @@ protected:
     });
   }
   void render_loop(voo::device_and_queue & dq, voo::swapchain_and_stuff & sw, auto && fn) {
-    ots_loop(dq, sw, [&](auto cb) {
-      auto scb = sw.cmd_render_pass({ cb });
-      fn(cb);
+    ots_loop(dq, sw, [&] {
+      auto scb = sw.cmd_render_pass();
+      fn();
     });
   }
 
